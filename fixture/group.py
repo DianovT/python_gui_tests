@@ -1,4 +1,3 @@
-from pywinauto import findbestmatch
 
 
 class GroupHelper:
@@ -22,6 +21,7 @@ class GroupHelper:
         input.type_keys("\n")
         self.close_group_editor()
 
+
     def open_group_editor(self):
         self.app.main_window.window(auto_id="groupButton").click()
         self.group_editor = self.app.application.window(title="Group editor")
@@ -30,11 +30,19 @@ class GroupHelper:
     def close_group_editor(self):
         self.group_editor.close()
 
-    def delete_group(self, text):
+    def delete_group(self, index):
         self.open_group_editor()
-        types_for_delete = self.group_editor.window(auto_id="uxAddressTreeView").ListView()
-        types_for_delete.select(text).click()
-        self.group_editor.window(name="uxDeleteAddressButton").click()
-        self.group_editor.window(name="uxDeleteAllRadioButton").click()
-        self.group_editor.window(name="uxOKAddressButton").click()
+        tree = self.group_editor.window(auto_id="uxAddressTreeView")
+        tree.get_item([0]).get_child(index).click()
+        self.open_window_delete_group()
+        self.delete_selected_group()
         self.close_group_editor()
+
+    def delete_selected_group(self):
+        self.open_window_delete_group.window(auto_id="uxDeleteAllRadioButton").click()
+        self.open_window_delete_group.window(auto_id="uxOKAddressButton").click()
+
+    def open_window_delete_group(self):
+        self.group_editor.window(auto_id="uxDeleteAddressButton").click()
+        self.open_window_delete_group = self.app.application.window(title="Delete group")
+        self.open_window_delete_group.wait("visible")
